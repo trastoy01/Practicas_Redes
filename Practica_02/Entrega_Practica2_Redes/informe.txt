@@ -1,0 +1,41 @@
+"""
+iii.- Comproba se e posíbel que o servidor envíe dúas mensaxes con sendas funcións send()
+e que o cliente reciba (despois dun tempo prudencial, usar a función sleep())
+ambas mensaxes cunha única sentencia recv(). Describe as modificacións
+introducidas nos códigos e o resultado obtido (número de bytes recibidos e a mensaxe).
+
+MODIFICACIONES:   -----> SOLO UNA SENTENCIA RECV(numero grande buffer para recibir ambos mensajes)
+Esta sentencia RECV no esta dentro de ningun bucle while ni bucles iterativos, es unica.
+
+mensaje = cliente_socket.recv(1000)  # Tamaño del buffer para recibir datos
+print(f"Mensaje recibido del servidor: {mensaje.decode('utf-8')}")
+print(f"Número de bytes recibidos {len(mensaje)}, contador:{contador} ")
+cliente_socket.close()
+
+    
+CONCLUSION: SOLO SE RECIBE EL PRIMER MENSAJE , EL SEGUNDO NO ES ESCUCHADO
+SI QUEREMOS ESCUCHAR VARIOS MENSAJES NECESITAMOS UN BUCLE WHILE PARA QUE ESTE ESCUCHANDO CONTINUAMENTE.
+"""
+
+
+ """
+iv.- Proba a usar no cliente un bucle de tipo  while len(mensaxe_recibida) > 0: e cambiar o seu buffer de recepción a 8.
+ Describe as modificacións introducidas nos códigos e o resultado obtido. 
+ (En python igual é máis sinxelo usar while(true) e if len(mensaxe_recibida) == 0: break;)
+
+
+Si cambiamos el tamaño del buffer para receibir datos(bytes), lo que ocurre es que el mensaje 
+se segmenta en trozos (se añaden a la cola del buffer de recepcion ), por lo cual recibimos el mismo mensaje
+que nos envia el servidor pero en varios mensajes del tamaño del buffer de recepcion
+
+MODIFICACIONES:
+
+WHILE TRUE:
+   ...CODIGO...
+   MENSAJE=CLIENTE_SOCKET.RECV(10)        
+   IF LEN(MENSAJE)==0
+   BREAK
+CLIENTE_SOCKET.CLOSE()
+
+"""
+
