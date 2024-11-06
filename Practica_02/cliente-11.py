@@ -48,6 +48,15 @@ import struct
 
 
 def recv_all(socket: socket.socket, tamano: int) -> bytes:
+    """Función que recibe una cantidad específica de datos de un socket
+
+    Args:
+        socket (socket.socket): Socket del que se recibirán los datos
+        tamano (int): Cantidad de datos a recibir en bytes
+
+    Returns:
+        bytes: Datos recibidos en formato bytes
+    """
     data = b""  # Inicializar data a un byte vacío
     while len(data) < tamano:  # Mientras no se haya recibido el tamaño completo
         paquete = socket.recv(tamano - len(data))  # Recibir el tamaño restante de datos
@@ -58,6 +67,14 @@ def recv_all(socket: socket.socket, tamano: int) -> bytes:
 
 
 def recv_all_with_size(socket: socket.socket) -> str:
+    """Función que recibe un mensaje de un socket, precedido por el tamaño del mensaje
+
+    Args:
+        socket (socket.socket): Socket del que se recibirá el mensaje
+
+    Returns:
+        str: Mensaje recibido, en formato texto
+    """
     # Primero recibimos los 4 bytes que contienen el tamaño del mensaje
     size_data = recv_all(socket, 4)
     size = struct.unpack("!I", size_data)[0]

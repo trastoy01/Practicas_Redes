@@ -96,7 +96,10 @@ def servidor(args: argparse.Namespace):
                 # Se envía un mensaje de saludo al cliente
                 mensaje1 = "¡Bienvenido al servidor TCP! Soy un servidor de prueba. Primero envío este mensaje."
                 mensaje2 = "Y ahora envío un segundo mensaje."
-
+                """ 
+                iii.- Comproba se e posíbel que o servidor envíe dúas mensaxes con sendas funcións send() e que o cliente reciba (despois dun tempo prudencial, usar a función sleep()) ambas mensaxes cunha única sentencia recv(). Describe as modificacións introducidas nos códigos e o resultado obtido (número de bytes recibidos e a mensaxe).
+                
+                Se envían dos mensajes al cliente con send() y se reciben con una única llamada a recv() después de un tiempo prudencial, pues estos mensajes se envían de manera secuencial y se almacenan en el buffer de recepción del cliente: mientras el buffer cuente con un tamaño mayor o igual al de los mensajes enviados, estos se recibirán en una única llamada a recv(). Aún con esto no se garantiza que los mensajes se reciban juntos, pues el buffer de recepción puede ser vaciado en cualquier momento; ni en el orden en que se enviaron, pues el sistema operativo puede decidir en qué orden se reciben los mensajes. Es critico entonces ajustar el tamaño y frecuanecia de los mensajes enviados y recibidos para garantizar que se reciban juntos y en el orden correcto."""
                 conn.send(mensaje1.encode())
                 conn.send(mensaje2.encode())
 

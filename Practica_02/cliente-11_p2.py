@@ -40,14 +40,25 @@ Entrega. Un arquivo comprimido zip con:
 - Informe sobre os puntos 1.3 e 1.4. Chamadeo ''informe.txt''
 - (Non obrigatorio) Unha captura de pantalla na que se poida ver que o cliente e servidor de maiúsculas se están executando en distinto ordenador (ou máquina virtual). """
 
-import socket
+import socket  # Importación de la librería socket para la comunicación por red
 import sys
-import argparse
-import struct
-from time import sleep
+import argparse  # Importación de la librería argparse para el manejo de argumentos por línea de comandos
+import struct  # Importación de la librería struct para el manejo de datos binarios
+from time import (
+    sleep,
+)  # Importación de la función sleep de la librería time para pausar la ejecución del programa
 
 
 def recv_all(sock: socket.socket, tamano: int) -> bytes:
+    """Función que recibe una cantidad específica de datos de un socket
+
+    Args:
+        sock (socket.socket): Socket del que se recibirán los datos
+        tamano (int): Cantidad de datos a recibir en bytes
+
+    Returns:
+        bytes: Datos recibidos en formato bytes
+    """
     chunks = []  # Inicializar una lista para almacenar los trozos de datos
     bytes_recd = 0  # Inicializar el contador de bytes recibidos
 
@@ -67,6 +78,14 @@ def recv_all(sock: socket.socket, tamano: int) -> bytes:
 
 
 def recv_all_with_size(sock: socket.socket) -> str:
+    """Función que recibe un mensaje de un socket, primero recibiendo el tamaño del mensaje y luego el mensaje en sí
+
+    Args:
+        sock (socket.socket): Socket del que se recibirá el mensaje
+
+    Returns:
+        str: Mensaje recibido en formato texto
+    """
     # Primero recibimos los 4 bytes que contienen el tamaño del mensaje
     size_data = recv_all(sock, 4)
     size = struct.unpack("!I", size_data)[0]
@@ -83,10 +102,11 @@ def recv_all_with_size(sock: socket.socket) -> str:
 
 
 def cliente():
-    s = None
+    s = None  # Inicializar el socket a None
     parser = argparse.ArgumentParser(
         description="Cliente TCP: [IP y puerto del servidor]"
     )
+    # Añadir los argumentos de IP y puerto del servidor
     parser.add_argument(
         "-i",
         "--ip",
@@ -120,7 +140,7 @@ def cliente():
         Se envían dos mensajes al cliente con send() y se reciben con una única llamada a recv() después de un tiempo prudencial, pues estos mensajes se envían de manera secuencial y se almacenan en el buffer de recepción del cliente: mientras el buffer cuente con un tamaño mayor o igual al de los mensajes enviados, estos se recibirán en una única llamada a recv(). Aún con esto no se garantiza que los mensajes se reciban juntos, pues el buffer de recepción puede ser vaciado en cualquier momento; ni en el orden en que se enviaron, pues el sistema operativo puede decidir en qué orden se reciben los mensajes. Es critico entonces ajustar el tamaño y frecuanecia de los mensajes enviados y recibidos para garantizar que se reciban juntos y en el orden correcto.
         
         iv.- Proba a usar no cliente un bucle de tipo  while len(mensaxe_recibida) > 0: e cambiar o seu buffer de recepción a 8. Describe as modificacións introducidas nos códigos e o resultado obtido. (En python igual é máis sinxelo usar while(true) e if len(mensaxe_recibida) == 0: break;)
-        De esta manera se ejecuta el recv con un buffer de 8 bytes y se sale del bucle cuando se recibe un mensaje vacío.
+        De esta manera se ejecuta el recv con un buffer de 8 bytes y se sale del bucle cuando se recibe un mensaje vacío. ::: esto se puede realizar de una manera mas ortodoxa con las funciones que se implemetan rcv_all_with_size y rcv_all
         while True:
             mensaje = s.recv(8)
             if len(mensaje) == 0:

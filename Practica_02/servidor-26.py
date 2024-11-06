@@ -81,7 +81,7 @@ def servidor(args: argparse.Namespace):
     # Recepción de datos y procesamiento
     while True:
         try:
-            datos = conn.recv(20).decode()  # Buffer de recepción de 1024 bytes
+            datos = conn.recv(20).decode()  # Buffer de recepción de 20 bytes
         except socket.error as e:
             print(f"Error al recibir datos: {e}")
             conn.close()
@@ -89,13 +89,6 @@ def servidor(args: argparse.Namespace):
             sys.exit(1)
 
         if not datos:  # Si no hay más datos, salir del bucle
-            break
-        if datos.endswith("fin") and datos != "fin":
-            datos = datos[:-3]
-            texto.append(datos.upper())
-            print(
-                f"Mensaje procesado: {datos.upper()} (Longitud: {len(datos.encode('utf-8'))} bytes)"
-            )
             break
 
         # Convertir la línea a mayúsculas

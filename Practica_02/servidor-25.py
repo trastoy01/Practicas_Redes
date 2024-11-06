@@ -81,11 +81,11 @@ def servidor():
             datos_mayus = datos.upper()
 
             # Enviar respuesta al cliente
-            conn.send(datos_mayus.encode("utf-8"))
+            datos_enviados = conn.send(datos_mayus.encode("utf-8"))
 
             # Imprimir el mensaje procesado y su longitud
             print(
-                f"Mensaje procesado: {datos_mayus} (Longitud: {len(datos_mayus.encode('utf-8'))} bytes)"
+                f"Mensaje procesado: {datos_mayus} (Longitud: {datos_enviados} bytes)"
             )
         except Exception as e:
             print(f"Error: {e}")
