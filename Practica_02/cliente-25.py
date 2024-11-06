@@ -33,19 +33,52 @@ Entrega. Un arquivo comprimido zip con:
 - (Non obrigatorio) Unha captura de pantalla na que se poida ver que o cliente e servidor de maiúsculas se están executando en distinto ordenador (ou máquina virtual).
 """
 
-import socket
-import sys
-import argparse
+import socket  # Importar módulo de sockets
+import sys  # Importar módulo de sistema
+import argparse  # Importar módulo de argumentos de línea de comandos
 
 
 def recv_all(socket: socket.socket, tamano: int) -> bytes:
+    """Función que recibe una cantidad específica de datos de un socket
+
+    Args:
+        socket (socket.socket): Socket del que se recibirán los datos
+        tamano (int): Cantidad de datos a recibir en bytes
+
+    Returns:
+        bytes: Datos recibidos en formato bytes
+    """
     data = b""  # Inicializar data a un byte vacío
     while len(data) < tamano:  # Mientras no se haya recibido el tamaño completo
         paquete = socket.recv(tamano - len(data))  # Recibir el tamaño restante de datos
-        if not paquete:  # Si no se recibe nada, la conexión está rota
+        if not paquete:  # Si no se recibe nada la conexión está rota
             raise RuntimeError("Conexión rota")
         data += paquete  # Añadir el paquete recibido a los datos
     return data  # Devolver los datos recibidos, en formato bytes
+
+
+def recv_all_with_size(socket: socket.socket) -> str:
+    """Función que recibe un mensaje de un socket, precedido por el tamaño del mensaje
+
+    Args:
+        socket (socket.socket): Socket del que se recibirá el mensaje
+
+    Returns:
+        str: Mensaje recibido, en formato texto
+    """
+    # Primero recibimos los 4 bytes que contienen el tamaño del mensaje
+    size_data = recv_all(socket, 4)
+    size = struct.unpack("!I", size_data)[0]
+    """struct.unpack('!I', size_data): Este comando convierte los 4 bytes que se recibieron en un número entero.
+    '!I' es un formato utilizado por la biblioteca struct para desempaquetar datos binarios:
+        '!': Indica que los datos están en formato big-endian (es decir, el byte más significativo viene primero). El formato de bytes en TCP/IP suele ser big-endian.
+        'I': Significa que estamos desempaquetando un entero de 4 bytes sin signo (unsigned int), que es el formato estándar para representar el tamaño de los datos en muchos protocolos.
+    size_data: Es el conjunto de 4 bytes que acabamos de recibir y que queremos convertir en un número entero.
+    [0]: Como struct.unpack() devuelve una tupla, se usa [0] para acceder al primer (y único) elemento de la tupla, que es el número entero que representa el tamaño de los datos que estamos por recibir.
+    """
+    return recv_all(
+        socket, size
+    ).decode()  # Devolver los datos recibidos, en formato texto
 
 
 def cliente():
@@ -89,6 +122,7 @@ def cliente():
 
     try:
         # Cargar contenido del archivo
+        """Leer el archivo de entrada: archivo.txt por defecto. Se codifica en utf-8 para manejar caracteres especiales y se recorre línea por línea, delimintando por '\n.'"""
         with open(args.file, "r", encoding="utf-8") as archivo:
             lineas = archivo.readlines()
     except FileNotFoundError:
@@ -107,15 +141,23 @@ def cliente():
         sys.exit(1)
 
     # Preparar el archivo de salida
-    archivo_salida = args.file + ".CAP"
+    archivo_salida = (
+        args.file + ".CAP"
+    )  # Nombre del archivo de salida, se le añade la extensión .CAP para indicar que está en mayúsculas
     with open(archivo_salida, "w", encoding="utf-8") as salida:
         for linea in lineas:
-            mensaje = linea.strip()
+            mensaje = (
+                linea.strip()
+            )  # Eliminar espacios en blanco al inicio y final de la línea
             print(f"Enviando mensaje: {mensaje} ({len(mensaje.encode('utf-8'))} bytes)")
-            s.sendall(mensaje.encode("utf-8"))
+            s.sendall(
+                mensaje.encode("utf-8")
+            )  # Enviar mensaje al servidor:: sendall() envía todos los datos, a diferencia de send() que puede no enviar todos los datos. Funcion de mayor nivel que send() pero equivalente a send() en este caso.
 
             # Recibir respuesta del servidor
-            respuesta = s.recv(1024).decode("utf-8")
+            respuesta = s.recv(1024).decode(
+                "utf-8"
+            )  # Recibir respuesta del servidor: el mensaje debe ser menor a 1024 bytes, en caso contrario usar recv_all_with_size()
             print(
                 f"Mensaje recibido del servidor: {respuesta} ({len(respuesta.encode('utf-8'))} bytes)"
             )

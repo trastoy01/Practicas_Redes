@@ -45,7 +45,7 @@ O código deberá estar correctamente formateado e tabulado.
 O código debe compilar nun sistema Linux con gcc (para C). Se se usa Windows, débese convertir o ficheiro co código a formato Unix.
 Os programas deben funcionar aínda que o cliente e o servidor se executen en computadores diferentes
 Os parámetros de entrada necesarios deben ser proporcionados como argumentos do main.
-Penalizarase que aparezan mensaxes de Warning na compilación (coa opción -Wall)(so C)
+Penalizarase que aparezan mensaxes de Warning na compilación (coa opción -Wall)(so C) 
 
 Entrega. Un arquivo comprimido zip con:
 - Os códigos (non os executables) dos puntos 1.1 (servidor básico), 1.2 (cliente básico) e 2 (servidor e cliente de maiúsculas, punto 2.6, se non se ten feito vale o 2.5).
