@@ -87,7 +87,6 @@ def servidor(args: argparse.Namespace):
             conn.close()
             servidor_socket.close()
             sys.exit(1)
-
         if not datos:  # Si no hay más datos, salir del bucle
             break
 
@@ -97,10 +96,21 @@ def servidor(args: argparse.Namespace):
         print(
             f"Mensaje procesado: {datos_mayus} (Longitud: {len(datos_mayus.encode('utf-8'))} bytes)"
         )
-
+    while True:
         # Enviar respuesta al cliente
         try:
-            conn.send(datos_mayus.encode("utf-8"))
+            for datos_mayus in texto:
+                length = conn.send(datos_mayus.encode("utf-8"))
+                print(
+                    f"Enviando datos al cliente: {datos_mayus} (Longitud: {length} bytes)"
+                )
+            try:
+                conn.shutdown(socket.SHUT_WR)
+            except socket.error as e:
+                print(f"Error al cerrar la conexión de escritura: {e}")
+                conn.close()
+                servidor_socket.close()
+                sys.exit(1)
         except socket.error as e:
             print(f"Error al enviar datos al cliente: {e}")
             conn.close()

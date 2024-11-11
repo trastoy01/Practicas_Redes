@@ -106,7 +106,7 @@ def cliente(args: argparse.Namespace):
         try:
             mensaje = cliente_socket.recv(
                 10
-            ).decode()  # Buffer de recepción de 1024 bytes
+            ).decode()  # Buffer de recepción de 10 bytes
         except socket.error as e:
             print(f"Error al recibir datos: {e}")
             cliente_socket.close()
