@@ -47,3 +47,35 @@ Entrega. Un arquivo comprimido zip con:
 - Pódense enviar tamén os códigos dos 1.a (programa básico que recibe) e 1.b (programa básico que envía) para evaluar no caso de que as versión do punto 1.d (versión con floats) teña erros.
 - Informe sobre os puntos 1.c, 1.d e 3.
 - (Non obrigatorio) Unha captura de pantalla na que se poida ver que o cliente e servidor de maiúsculas se están executando en distinto ordenador (ou máquina virtual)."""
+
+"""d. Modificar os programas para que, en vez de transmitir cadeas de texto, transmitase un array de números de tipo float (números reais). O número de datos enviados debese especificar únicamente no programa que envía. É dicir, o programa que recibe debe ser capaz de recibir todos os datos enviados e determinar dito número de datos. Describe as modificacións introducidas nos códigos e o resultado obtido. En Python pódese usar a librería "struct" e as súas funcións "pack" e "unpack" para obter os bytes a partires dos floats. (Python usa o double por defecto para os números reais, comprobar se hai erros ao empaquetar en float e modificade o programa para usar double). (chamadeos "f-recibe-udp-1d.py" e "f-envia-udp-1d")"""
+
+import socket
+import sys
+import argparse
+import struct
+
+
+def servidor():
+    """Función que recibe un mensaje de un cliente UDP"""
+    parser = argparse.ArgumentParser(description="Servidor UDP")
+    parser.add_argument("port", type=int, help="Puerto en el que escuchará el servidor")
+    args = parser.parse_args()
+    port = args.port
+
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind(("0.0.0.0", port))
+        print(f"Servidor escuchando en puerto {port}")
+        data, addr = sock.recvfrom(1024)
+        num_floats = len(data) // 4
+        floats = struct.unpack(f"{num_floats}f", data)
+        print(f"IP del cliente: {addr[0]}")
+        print(f"Puerto del cliente: {addr[1]}")
+        print(f"Números recibidos: {floats}")
+        print(f"Número elementos recibidos: {num_floats}")
+
+    except socket.error as e:
+        print("Error en el socket:", e)
+    except KeyboardInterrupt:
+        print("Servidor interrumpido")
