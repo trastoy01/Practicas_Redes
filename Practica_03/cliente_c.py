@@ -103,7 +103,7 @@ def cliente():
         # Dirección del servidor
         server_address = (args.ip, args.port) # Dirección del servidor, IP y puerto
         # Mensaje a enviar
-        message = b"Mensaje de prueba" # Mensaje a enviar, en formato bytes
+        message = b"Mensaje de prueba"*1024 # Mensaje a enviar que supera el tamaño del buffer de recepción del servidor
         """fragment_size = 1024  # Tamaño de los fragmentos a enviar para que el tamaño del buffer no se exceda y limitar la perdida de datos: PERO NO FUNCIONA DE ESA MANERA EN UDP PUES NO HAY GARANTÍA DE QUE LOS DATOS LLEGUEN EN ORDEN NI DE QUE LLEGUEN DEBIDO A LA CONGESTION DE LA RED O A BUFFERS LLENOS, SE DEBE CONFIGURAR EL BUFFER DE RECEPCIÓN CON UN TAMAÑO ADECUADO, MAYOR O IGUAL AL TAMAÑO DEL MENSAJE A RECIBIR
         for i in range(0, len(args.message), fragment_size):
             message = args.message[i:i+fragment_size].encode()
