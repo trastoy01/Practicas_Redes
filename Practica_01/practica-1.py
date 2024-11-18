@@ -123,18 +123,19 @@ def resolve_hostname(ip_input: str) -> str:
         if (
             ":" in ip_input or "." in ip_input
         ):  # Si contiene ':' o '.' es una dirección IP, sino es hexadecimal
-            hostname = socket.gethostbyaddr(ip_input)[0]
+            hostname = socket.getnameinfo((ip_input, 0), 0)[0]
+            # hostname = socket.gethostbyaddr(ip_input)[0]  # Depreciada ___ getadrebyname
         elif is_hex(ip_input):
             if len(ip_input) == 8:  # IPv4 en hexadecimal tiene 8 caracteres
                 ipv4_address = hex_to_ipv4(ip_input)
                 if ipv4_address != "Desconocido":
-                    hostname = socket.gethostbyaddr(ipv4_address)[0]
+                    hostname = socket.getnameinfo((ipv4_address, 0), 0)[0]
                 else:
                     hostname = "Desconocido"
             elif len(ip_input) == 32:  # IPv6 en hexadecimal tiene 32 caracteres
                 ipv6_address = hex_to_ipv6(ip_input)
                 if ipv6_address != "Desconocido":
-                    hostname = socket.gethostbyaddr(ipv6_address)[0]
+                    hostname = socket.getnameinfo((ipv6_address, 0), 0)[0]
                 else:
                     hostname = "Desconocido"
             else:
@@ -179,26 +180,41 @@ def main():
         print(f"Introduciuse un nome de host: {args.nome_host}")
         try:
             # Usamos getaddrinfo para obtener información del host
-            info = socket.getaddrinfo(args.nome_host, None)
+            info = socket.getaddrinfo(args.nome_host, None, flags=socket.AI_CANONNAME)
+            # Imprimimos una cabecera para mostrar los resultados
             print("****************************************************************")
-            print(f"Nome canónico: {args.nome_host}")
+
+            # Iteramos por cada resultado de la lista devuelta por getaddrinfo
             for res in info:
+                # Obtenemos el nombre canónico del host
+                canonico = res[3] if res[3] else "Descocido"
+                # canonico = res[3] if res[3] else socket.getnameinfo(res[4], 0)[0]
+                print(f"Nome canónico: {canonico}")
+
+                # Obtenemos la dirección IP del host (índice 4 en cada tupla de resultado)
                 ip = res[4][0]
-                if ":" not in ip:  # Si es IPv4
+
+                # Si es una dirección IPv4
+                if ":" not in ip:
                     hex_ip = (
                         binascii.hexlify(socket.inet_pton(socket.AF_INET, ip))
                         .decode()
                         .upper()
                     )
                     print(f"Dirección IPv4: {ip} {hex_ip}")
-                else:  # Si es IPv6
+
+                # Si es una dirección IPv6
+                else:
                     hex_ip = (
                         binascii.hexlify(socket.inet_pton(socket.AF_INET6, ip))
                         .decode()
                         .upper()
                     )
                     print(f"Dirección IPv6: {ip} {hex_ip}")
+
+            # Finalizamos la cabecera
             print("****************************************************************")
+
         except socket.gaierror as e:
             print(f"Erro resolvendo o host {args.nome_host}: {e}")
 
