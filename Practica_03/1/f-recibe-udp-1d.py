@@ -48,78 +48,36 @@ Entrega. Un arquivo comprimido zip con:
 - Informe sobre os puntos 1.c, 1.d e 3.
 - (Non obrigatorio) Unha captura de pantalla na que se poida ver que o cliente e servidor de maiúsculas se están executando en distinto ordenador (ou máquina virtual)."""
 
-""" d. Modificar os programas para que, en vez de transmitir cadeas de texto, transmitase un array de números de tipo float (números reais). O número de datos enviados debese especificar únicamente no programa que envía. É dicir, o programa que recibe debe ser capaz de recibir todos os datos enviados e determinar dito número de datos. Describe as modificacións introducidas nos códigos e o resultado obtido. En Python pódese usar a librería "struct" e as súas funcións "pack" e "unpack" para obter os bytes a partires dos floats. (Python usa o double por defecto para os números reais, comprobar se hai erros ao empaquetar en float e modificade o programa para usar double). (chamadeos "f-recibe-udp-1d.py" e "f-envia-udp-1d"):"""
+"""d. Modificar os programas para que, en vez de transmitir cadeas de texto, transmitase un array de números de tipo float (números reais). O número de datos enviados debese especificar únicamente no programa que envía. É dicir, o programa que recibe debe ser capaz de recibir todos os datos enviados e determinar dito número de datos. Describe as modificacións introducidas nos códigos e o resultado obtido. En Python pódese usar a librería "struct" e as súas funcións "pack" e "unpack" para obter os bytes a partires dos floats. (Python usa o double por defecto para os números reais, comprobar se hai erros ao empaquetar en float e modificade o programa para usar double). (chamadeos "f-recibe-udp-1d.py" e "f-envia-udp-1d")"""
 
 import socket
 import sys
 import argparse
 import struct
 
-def cliente():
-    sock = None
-    """Función que envía un mensaje a un servidor UDP"""
-    parser = argparse.ArgumentParser(description="Cliente UDP")
-    parser.add_argument(
-        "-i",
-        "--ip",
-        dest="ip",
-        required=True,
-        help="IP del servidor",
-        action="store",
-        type=str,
-    )
-    parser.add_argument(
-        "-p",
-        "--port",
-        dest="port",
-        required=True,
-        help="Puerto del servidor",
-        action="store",
-        type=int,
-    )
-    parser.add_argument(
-        "-pp",
-        "--port_propio",
-        dest="port_propio",
-        action="store",
-        default=0
-        help="Puerto propio",
-        type=int,
-    )
-    parser.add_argument(
-        "-n",
-        "--num_datos",
-        dest="num_datos",
-        required=True,
-        help="Número de datos a enviar",
-        action="store",
-        type=int,
-    )
+
+def servidor():
+    """Función que recibe un mensaje de un cliente UDP"""
+    parser = argparse.ArgumentParser(description="Servidor UDP")
+    parser.add_argument("port", type=int, help="Puerto en el que escuchará el servidor")
     args = parser.parse_args()
+    port = args.port
+
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        server_address = (args.host, args.port)
-        port_own = args.port_own
-        num_datos = args.num_datos
-        sock.bind(("0.0.0.0", port_own))
-        data=[]
-        for i in range(num_datos):
-            data.append(float(i))
-        data = struct.pack(f"{num_datos}f", *data) # Empaquetar los datos en formato float
-        sent = sock.sendto(data, server_address)
-        print(f"Enviados {sent} bytes")
+        sock.bind(("0.0.0.0", port))
+        print(f"Servidor escuchando en puerto {port}")
+        data, addr = sock.recvfrom(1024)
+        # num_double = len(data) // 8
+        # doubles = struct.unpack(f"{num_double}d", data)
+        num_floats = len(data) // 4
+        floats = struct.unpack(f"{num_floats}f", data)
+        print(f"IP del cliente: {addr[0]}")
+        print(f"Puerto del cliente: {addr[1]}")
+        print(f"Números recibidos: {floats}")
+        print(f"Número elementos recibidos: {num_floats}")
+
     except socket.error as e:
         print("Error en el socket:", e)
     except KeyboardInterrupt:
-        print("Cliente interrumpido")
-    except Exception as e:
-        print("Error inesperado:", e)
-        
-    finally:
-        if sock is not None:
-            sock.close()
-if __name__ == "__main__":
-    cliente()
-    sys.exit(0)
-        
-        
+        print("Servidor interrumpido")
